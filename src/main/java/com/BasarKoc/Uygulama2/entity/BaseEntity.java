@@ -1,6 +1,7 @@
 package com.BasarKoc.Uygulama2.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import java.util.Date;
 @MappedSuperclass
 @Getter
 @Setter
+@NoArgsConstructor
 public abstract class  BaseEntity implements Serializable {
 
     @Column(name = "created_at")
