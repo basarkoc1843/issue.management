@@ -21,21 +21,35 @@ public class ProjectServiceImpl implements ProjectService {
         this.modelMapper=modelMapper;
     }
     @Override
-    public Project save(Project project) {
-        if(project.getProjectCode()==null){
-            throw new IllegalArgumentException("Project Code cannot be");
-        }
-        return this.projectRepository.save(project);
+    public ProjectDto save(ProjectDto project) {
+        Project projectCheck=this.projectRepository.getByProjectCode(project.getProjectCode());
+        if(projectCheck!=null)
+            throw new IllegalArgumentException("ProjectCode Already Exist");
+
+           Project p=modelMapper.map(project,Project.class);
+           p=this.projectRepository.save(p);
+           project.setId(p.getId());
+           return project;
+
+
+
     }
 
     @Override
     public ProjectDto getById(Long id) {
+        if(id==null) {
+            throw new IllegalArgumentException("id NULL");
+        }
         Project p=projectRepository.getOne(id);
+        if(p==null) {
+            throw new IllegalArgumentException("Boyle Bir Proje Yok");
+        }
          return modelMapper.map(p,ProjectDto.class);
+
     }
 
     @Override
-    public List<Project> getByProjectCode(String projectCode) {
+    public ProjectDto getByProjectCode(String projectCode) {
         return null;
     }
 
@@ -50,7 +64,32 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public boolean delete(Project project) {
+    public ProjectDto update(Long id,ProjectDto projectDto) {
+        Project project=this.projectRepository.getOne(id);
+
+        if(project==null)
+            throw new IllegalArgumentException("Project Does Not Exist ID:"+id);
+
+       Project projectCheck=this.projectRepository.getByProjectCodeAndIdNot(projectDto.getProjectCode(),id);
+       if(projectCheck!=null)
+           throw new IllegalArgumentException("Project Code Already Exist");
+
+       project.setProjectCode(projectDto.getProjectCode());
+       project.setProjectName(projectDto.getProjectName());
+
+       this.projectRepository.save(project);
+       return this.modelMapper.map(project,ProjectDto.class);
+
+
+    }
+
+    @Override
+    public Boolean delete(Project project) {
         return false;
+    }
+
+    public Boolean delete(Long id) {
+        this.projectRepository.deleteById(id);
+        return true;
     }
 }
